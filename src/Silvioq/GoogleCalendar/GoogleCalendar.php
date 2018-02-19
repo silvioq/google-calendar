@@ -57,11 +57,13 @@ class GoogleCalendar
             'application_name' => __CLASS__,
             'google_client' => null,
             'converter' => null,
+            'credentials_path' => null,
         ]);
 
         $resolver->setAllowedTypes('application_name', 'string')
             ->setAllowedTypes('google_client', ['null', \Google_Client::class])
-            ->setAllowedTypes('converter', ['null', Converter\ConverterInterface::class]);
+            ->setAllowedTypes('converter', ['null', Converter\ConverterInterface::class])
+            ->setAllowedTypes('credentials_path', ['null','string'])
             ;
 
         $options = $resolver->resolve($options);
@@ -69,6 +71,8 @@ class GoogleCalendar
         $this->applicationName = $options['application_name'];
         $this->client = $options['google_client'];
         $this->converter = $options['converter'] ?? new Converter\GoogleEventConverter();
+        if ($options['credentials_path'])
+            $this->setCredentialsPath($options['credentials_path']);
     }
 
     /**
