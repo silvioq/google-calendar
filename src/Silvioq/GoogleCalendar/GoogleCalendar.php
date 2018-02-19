@@ -149,6 +149,14 @@ class GoogleCalendar
 
     /**
      * List all evens between times
+     *
+     * @param string $calendarId
+     * @param \DateTime $from
+     * @param \DateTime $to
+     * @param $pageToken
+     * @param int $maxResults
+     *
+     * @return array
      */
     public function getEvents(string $calendarId, \DateTime $from = null, \DateTime $to = null, &$pageToken = null, $maxResults = 100):array
     {
@@ -165,15 +173,23 @@ class GoogleCalendar
         $events = $this->getCalendarService()->events->listEvents($calendarId, $opts);
         $pageToken = $events->getNextPageToken();
 
-        return array_map( function($ge) use($calendarId) { return $this->converter->toEvent($ge)->setCalendarId($calendarId); }, $events->getItems());
+        return array_map( function($ge) use($calendarId) {
+                return $this->converter->toEvent($ge)->setCalendarId($calendarId); }, $events->getItems());
     }
 
-    private function getCalendarService():\Google_Service_Calendar
-    {
-        return new \Google_Service_Calendar($this->getClient());
-    }
-
-    public function buildClientWithAuthToken(string $authCode, \Google_Client $client = null)
+    /**
+     * Client generation from authentication code
+     *
+     * This function generates a client from auth code obtained from OAUTHv2
+     * authentication.
+     * After success authentication, credentials file (with authToken and
+     * refreshToken) will be created
+     *
+     * See examples/build-at.php sript for use example
+     *
+     * @return self
+     */
+    public function buildClientWithAuthToken(string $authCode, \Google_Client $client = null):self
     {
         if (null === $client)
             $client = new \Google_Client();
@@ -189,6 +205,11 @@ class GoogleCalendar
 
         $this->client = $client;
         return $this;
+    }
+
+    private function getCalendarService():\Google_Service_Calendar
+    {
+        return new \Google_Service_Calendar($this->getClient());
     }
 
     /**
