@@ -1,0 +1,4 @@
+vendor/*
+.*.sw?
+composer.lock
+.data
