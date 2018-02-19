@@ -2,6 +2,8 @@
 
 namespace Silvioq\GoogleCalendar;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * Class GoogleCalendar
  *
@@ -43,13 +45,30 @@ class GoogleCalendar
     private $client;
 
     /**
-     * @param string $applicationName
+     * @param array $options
+     *   - application_name
+     *   - google_client
+     *   - converter: Instance of Converter\ConverterInterface or null
      */
-    public function __construct(string $applicationName = null, \Google_Client $client = null)
+    public function __construct(array $options = [])
     {
-        $this->applicationName = $applicationName ?? __CLASS__;
-        $this->client = $client;
-        $this->converter = new Converter\GoogleEventConverter();
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'application_name' => __CLASS__,
+            'google_client' => null,
+            'converter' => null,
+        ]);
+
+        $resolver->setAllowedTypes('application_name', 'string')
+            ->setAllowedTypes('google_client', ['null', \Google_Client::class])
+            ->setAllowedTypes('converter', ['null', Converter\ConverterInterface::class]);
+            ;
+
+        $options = $resolver->resolve($options);
+
+        $this->applicationName = $options['application_name'];
+        $this->client = $options['google_client'];
+        $this->converter = $options['converter'] ?? new Converter\GoogleEventConverter();
     }
 
     /**
@@ -146,7 +165,7 @@ class GoogleCalendar
         $events = $this->getCalendarService()->events->listEvents($calendarId, $opts);
         $pageToken = $events->getNextPageToken();
 
-        return array_map( function($ge) { $event = new GoogleEvent(); return $this->converter->toEvent($ge, $event); }, $events->getItems());
+        return array_map( function($ge) use($calendarId) { return $this->converter->toEvent($ge)->setCalendarId($calendarId); }, $events->getItems());
     }
 
     private function getCalendarService():\Google_Service_Calendar

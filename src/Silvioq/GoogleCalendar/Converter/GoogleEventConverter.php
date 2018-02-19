@@ -4,6 +4,7 @@ namespace Silvioq\GoogleCalendar\Converter;
 
 use Google_Service_Calendar_Event;
 use Silvioq\GoogleCalendar\GoogleEventInterface;
+use Silvioq\GoogleCalendar\GoogleEvent;
 
 /**
  * Class GoogleEventConverter
@@ -13,7 +14,7 @@ use Silvioq\GoogleCalendar\GoogleEventInterface;
  *
  * @author Silvioq <silvioq@gmail.com>
  */
-class GoogleEventConverter
+class GoogleEventConverter implements ConverterInterface
 {
     /**
      * Converts GoogleEventInterface in native google event
@@ -54,8 +55,10 @@ class GoogleEventConverter
     /**
      * Build event from Google native event
      */
-    public function toEvent(Google_Service_Calendar_Event $googleEvent, GoogleEventInterface $event):GoogleEventInterface
+    public function toEvent(Google_Service_Calendar_Event $googleEvent):GoogleEventInterface
     {
+        $event = new GoogleEvent();
+
         $event->setSummary($googleEvent->getSummary())
             ->setDescription($googleEvent->getDescription())
             ->setEventId($googleEvent->getId());
