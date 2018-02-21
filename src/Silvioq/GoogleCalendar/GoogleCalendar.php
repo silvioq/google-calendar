@@ -135,8 +135,12 @@ class GoogleCalendar
      */
     public function addEvent(GoogleEventInterface $event):self
     {
-        return $this->getCalendarService()->events->insert($event->getCalendarId(),
+        $gevent = $this->getCalendarService()->events->insert($event->getCalendarId(),
                 $this->converter->toGoogleEvent($event));
+
+        $event->setEventId($gevent->getId());
+
+        return $this;
     }
 
     /**

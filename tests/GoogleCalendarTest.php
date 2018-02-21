@@ -92,5 +92,42 @@ class GoogleCalendarTest extends TestCase
         $this->assertNotNull($items = $calendar->listCalendars());
         $this->assertSame( [1,2,3], $items);
     }
+
+    /**
+     * @depends testSimpleCreation
+     */
+    public function testAddEvent()
+    {
+        $mockClient = $this->getMockBuilder(\Google_Client::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockClient->expects($this->any())
+            ->method('getLogger')
+            ->willReturn(new \Psr\Log\NullLogger())
+            ;
+
+        $eventResponse = new \Google_Service_Calendar_Event();
+        $eventResponse->setId( 'id' );
+
+        $mockClient->expects($this->once())
+            ->method('execute')
+            ->willReturn($eventResponse);
+
+        $calendar = new GoogleCalendar([
+            'google_client' => $mockClient,
+        ]);
+
+        $event = (new \Silvioq\GoogleCalendar\GoogleEvent())
+            ->setSummary('Summary')
+            ->setCalendarId('calendarId')
+            ->setStart(new \DateTime('tomorrow'))
+            ->setEnd(new \DateTime('tomorrow'))
+            ->setAllDay(true)
+            ;
+
+        $this->assertNotNull($calendar->addEvent($event));
+        $this->assertSame( 'id', $event->getEventId());
+    }
 }
 // vim:sw=4 ts=4 sts=4 et
