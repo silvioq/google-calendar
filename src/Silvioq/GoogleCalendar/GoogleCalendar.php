@@ -227,44 +227,7 @@ class GoogleCalendar
             return $this->client;
 
         $client = new \Google_Client();
-
-        $client->setApplicationName($this->applicationName);
-        $client->setAuthConfig($this->clientSecretPath);
-        $client->setScopes(implode(' ', [\Google_Service_Calendar::CALENDAR]));
-        $client->setApprovalPrompt("auto");
-        $client->setAccessType("offline");
-
-        if (null === $this->accessToken && file_exists($this->credentialsPath)) {
-            $accessToken = json_decode(file_get_contents($this->credentialsPath), true);
-        } else {
-            $accessToken = $this->accessToken;
-        }
-
-        if ($accessToken)
-            $client->setAccessToken($accessToken);
-
-        if ($client->getRefreshToken()) {
-            $this->refreshToken = $client->getRefreshToken();
-        }
-
-        if ($client->isAccessTokenExpired()) {
-            if (null === $this->refreshToken) {
-                $refreshToken = $this->refreshToken;
-            } else {
-                $refreshToken = $client->getRefreshToken();
-            }
-
-            if (null === $refreshToken) {
-                throw (new Exception\InvalidAccessTokenException('Token expired. Must inform refresh token.'))->setAuthUrl($client->createAuthUrl());
-            }
-
-            $res = $client->fetchAccessTokenWithRefreshToken($refreshToken);
-            if (!isset($res['access_token'])) {
-                throw (new Exception\InvalidAccessTokenException('Token expired. Must get new access token.'))->setAuthUrl($client->createAuthUrl());
-            }
-
-            file_put_contents($this->credentialsPath, json_encode($client->getAccessToken()));
-        }
+        (new ClientConfigurator($this->applicationName, $this->clientSecretPath, $this->credentialsPath, $this->accessToken, $this->refreshToken))->configure($client);
 
         return $this->client = $client;
     }
