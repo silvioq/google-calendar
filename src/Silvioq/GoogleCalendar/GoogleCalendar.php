@@ -49,6 +49,7 @@ class GoogleCalendar
      *   - application_name
      *   - google_client
      *   - converter: Instance of Converter\ConverterInterface or null
+     *   - credentials_path: string path to credentials file.
      */
     public function __construct(array $options = [])
     {
