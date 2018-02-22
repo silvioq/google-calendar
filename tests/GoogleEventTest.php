@@ -3,8 +3,8 @@
 namespace Silvioq\GoogleCalendar\Tests;
 
 use Silvioq\GoogleCalendar\GoogleEvent;
+use Silvioq\GoogleCalendar\GoogleEventInterface;
 use PHPUnit\Framework\TestCase;
-
 
 Class GoogleEventTest extends TestCase
 {
@@ -18,6 +18,7 @@ Class GoogleEventTest extends TestCase
             ->setEnd(new \DateTime('1986-06-25'))
             ->setDescription('Description')
             ->setSummary('Summary')
+            ->setStatus(GoogleEventInterface::STATUS_CONFIRMED)
             ->addAttendee('a@gmail.com')
             ->addAttendee('a2@gmail.com')
             ;
@@ -30,6 +31,20 @@ Class GoogleEventTest extends TestCase
         $this->assertSame('Summary', $event->getSummary());
         $this->assertSame('Description', $event->getDescription());
         $this->assertSame(['a@gmail.com', 'a2@gmail.com'], $event->getAttendees());
+        $this->assertSame(GoogleEventInterface::STATUS_CONFIRMED, $event->getStatus());
+    }
+
+    public function testGoogleEventStatusMustBeTentativeByDefault()
+    {
+        $this->assertSame(GoogleEventInterface::STATUS_TENTATIVE, (new GoogleEvent())->getStatus());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGogleEventStatusValidation()
+    {
+        (new GoogleEvent())->setStatus('not valid status');
     }
 
     public function testGoogleEventAttendeeDuplicates()

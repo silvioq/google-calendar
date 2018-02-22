@@ -9,6 +9,10 @@ namespace Silvioq\GoogleCalendar;
  */
 interface GoogleEventInterface
 {
+    const STATUS_TENTATIVE = 'tentative';
+    const STATUS_CONFIRMED = 'confirmed';
+    const STATUS_CANCELLED = 'cancelled';
+
     public function setCalendarId(string $calendarId):GoogleEventInterface;
     public function getCalendarId():string;
 
@@ -30,6 +34,9 @@ interface GoogleEventInterface
     public function addAttendee(string $attendee):GoogleEventInterface;
     public function removeAttendee(string $attendee):GoogleEventInterface;
     public function getAttendees():array;
+
+    public function setStatus(string $status):GoogleEventInterface;
+    public function getStatus():string;
 
     public function setAllDay(bool $allDay):GoogleEventInterface;
     public function getAllDay():bool;

@@ -152,6 +152,7 @@ class GoogleCalendarTest extends TestCase
         $start->setDate('1986-06-22');
         $eventResponse->setStart($start);
         $eventResponse->setEnd(clone $start);
+        $eventResponse->setStatus('confirmed');
 
         $mockClient->expects($this->once())
             ->method('execute')
@@ -165,6 +166,7 @@ class GoogleCalendarTest extends TestCase
         $this->assertSame('calendar_id',$event->getCalendarId());
         $this->assertSame('my summary',$event->getSummary());
         $this->assertSame('1986-06-22', $event->getStart()->format('Y-m-d'));
+        $this->assertSame(GoogleEventInterface::STATUS_CONFIRMED, $event->getStatus());
     }
 
 

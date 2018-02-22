@@ -49,6 +49,11 @@ class GoogleEvent implements GoogleEventInterface
      */
     private $allDay = false;
 
+    /**
+     * @var string
+     */
+    private $status = GoogleEventInterface::STATUS_TENTATIVE;
+
 
     public function setCalendarId(string $calendarId):GoogleEventInterface
     {
@@ -72,6 +77,22 @@ class GoogleEvent implements GoogleEventInterface
     public function getEventId():string
     {
         return $this->eventId;
+    }
+
+    public function setStatus(string $status):GoogleEventInterface
+    {
+        if (!in_array($status, [GoogleEventInterface::STATUS_TENTATIVE, GoogleEventInterface::STATUS_CONFIRMED, GoogleEventInterface::STATUS_CANCELLED])) {
+            throw new \InvalidArgumentException('Status must be tentative, confirmed or cancelled');
+        }
+
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getStatus():string
+    {
+        return $this->status;
     }
 
     public function setStart(\DateTime $start):GoogleEventInterface

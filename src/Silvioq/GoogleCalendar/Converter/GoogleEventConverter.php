@@ -40,7 +40,7 @@ class GoogleEventConverter implements ConverterInterface
         $googleEvent->setStart($start);
         $googleEvent->setEnd($end);
 
-        $googleEvent->setStatus('tentative');
+        $googleEvent->setStatus($event->getStatus());
         $googleEvent->setDescription($event->getDescription());
 
         $googleEvent->attendees = array_map( function($email) {
@@ -61,13 +61,14 @@ class GoogleEventConverter implements ConverterInterface
 
         $event->setSummary($googleEvent->getSummary())
             ->setDescription($googleEvent->getDescription())
-            ->setEventId($googleEvent->getId());
+            ->setEventId($googleEvent->getId())
+            ->setStatus($googleEvent->getStatus());
 
         foreach ($googleEvent->getAttendees() as $a) {
             $event->addAttendee($a->getEmail());
         }
 
-        if ($googleEvent->getStatus() === 'canceled') {
+        if ($googleEvent->getStatus() === GoogleEventInterface::STATUS_CANCELLED) {
             $start = $googleEvent->getStart();
             if (null === $start) {
                 $start = $googleEvent->getOriginalStartTime();
