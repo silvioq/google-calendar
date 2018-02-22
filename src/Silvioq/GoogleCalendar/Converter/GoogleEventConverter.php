@@ -63,6 +63,10 @@ class GoogleEventConverter implements ConverterInterface
             ->setDescription($googleEvent->getDescription())
             ->setEventId($googleEvent->getId());
 
+        foreach ($googleEvent->getAttendees() as $a) {
+            $event->addAttendee($a->getEmail());
+        }
+
         if ($googleEvent->getStatus() === 'canceled') {
             $start = $googleEvent->getStart();
             if (null === $start) {
