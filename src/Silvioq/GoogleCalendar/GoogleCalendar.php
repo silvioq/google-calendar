@@ -129,6 +129,19 @@ class GoogleCalendar
     }
 
     /**
+     * @param string $calendarId
+     * @param string $eventId
+     * @return GoogleEventInterface
+     */
+    public function getEvent(string $calendarId, string $eventId):GoogleEventInterface
+    {
+        $googleEvent = $this->getCalendarService()->events->get($calendarId, $eventId);
+        $event = $this->converter->toEvent($googleEvent)->setCalendarId($calendarId);
+
+        return $event;
+    }
+
+    /**
      * @param GoogleEventInterface $event
      *
      * @return self
@@ -139,6 +152,31 @@ class GoogleCalendar
                 $this->converter->toGoogleEvent($event));
 
         $event->setEventId($gevent->getId());
+
+        return $this;
+    }
+
+    /**
+     * @param GoogleEventInterface $event
+     *
+     * @return self
+     */
+    public function updateEvent(GoogleEventInterface $event):self
+    {
+        $this->getCalendarService()->events->update($event->getCalendarId(), $event->getEventId(),
+                $this->converter->toGoogleEvent($event));
+
+        return $this;
+    }
+
+    /**
+     * @param GoogleEventInterface $event
+     *
+     * @return self
+     */
+    public function deleteEvent(GoogleEventInterface $event):self
+    {
+        $this->getCalendarService()->events->delete($event->getCalendarId(), $event->getEventId());
 
         return $this;
     }
