@@ -63,7 +63,22 @@ class GoogleEventConverter implements ConverterInterface
             ->setDescription($googleEvent->getDescription())
             ->setEventId($googleEvent->getId());
 
-        $start = $googleEvent->getStart();
+        if ($googleEvent->getStatus() === 'canceled') {
+            $start = $googleEvent->getStart();
+            if (null === $start) {
+                $start = $googleEvent->getOriginalStartTime();
+            }
+        } else {
+            $start = $googleEvent->getStart();
+        }
+
+        if (null === $start)
+            return $event;
+
+        $end = $googleEvent->getEnd();
+        if (!$end) $end = clone $start;
+
+
         if ($start->getDate()) {
             $event->setStart(new \DateTime($start->getDate()));
             $event->setAllDay(true);
@@ -75,7 +90,7 @@ class GoogleEventConverter implements ConverterInterface
         if ($start->getTimezone() )
             $event->getStart()->setTimezone(new \DateTimeZone($start->getTimezone()));
 
-        $end = $googleEvent->getStart();
+        $end = $googleEvent->getEnd();
         if ($end->getDate()) {
             $event->setEnd(new \DateTime($end->getDate()));
         } else {
